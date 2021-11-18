@@ -107,7 +107,7 @@ def download(tickers, start=None, end=None, actions=False, threads=True,
                                    actions=actions, auto_adjust=auto_adjust,
                                    back_adjust=back_adjust,
                                    progress=(progress and i > 0), proxy=proxy,
-                                   rounding=rounding, timeout=timeout)
+                                   rounding=rounding, timeout=timeout, **kwargs)
         while len(shared._DFS) < len(tickers):
             _time.sleep(0.01)
 
@@ -118,7 +118,7 @@ def download(tickers, start=None, end=None, actions=False, threads=True,
                                  start=start, end=end, prepost=prepost,
                                  actions=actions, auto_adjust=auto_adjust,
                                  back_adjust=back_adjust, proxy=proxy,
-                                 rounding=rounding, timeout=timeout)
+                                 rounding=rounding, timeout=timeout, **kwargs)
             shared._DFS[ticker.upper()] = data
             if progress:
                 shared._PROGRESS_BAR.animate()
@@ -183,11 +183,11 @@ def _download_one_threaded(ticker, start=None, end=None,
                            auto_adjust=False, back_adjust=False,
                            actions=False, progress=True, period="max",
                            interval="1d", prepost=False, proxy=None,
-                           rounding=False, timeout=None):
+                           rounding=False, timeout=None, **kwargs):
 
     data = _download_one(ticker, start, end, auto_adjust, back_adjust,
                          actions, period, interval, prepost, proxy, rounding,
-                         timeout)
+                         timeout, **kwargs)
     shared._DFS[ticker.upper()] = data
     if progress:
         shared._PROGRESS_BAR.animate()
@@ -197,11 +197,11 @@ def _download_one(ticker, start=None, end=None,
                   auto_adjust=False, back_adjust=False,
                   actions=False, period="max", interval="1d",
                   prepost=False, proxy=None, rounding=False,
-                  timeout=None):
+                  timeout=None, **kwargs):
 
     return Ticker(ticker).history(period=period, interval=interval,
                                   start=start, end=end, prepost=prepost,
                                   actions=actions, auto_adjust=auto_adjust,
                                   back_adjust=back_adjust, proxy=proxy,
                                   rounding=rounding, many=True,
-                                  timeout=timeout)
+                                  timeout=timeout, **kwargs)

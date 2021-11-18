@@ -64,6 +64,13 @@ def get_all_by_isin(isin, proxy=None, session=None):
     except Exception:
         return {}
 
+def get_proxy(proxy):
+    if proxy is not None:
+        if isinstance(proxy, dict) and "https" in proxy:
+            proxy = proxy["https"]
+        proxy = {"https": proxy}
+    return proxy
+
 
 def get_ticker_by_isin(isin, proxy=None, session=None):
     data = get_all_by_isin(isin, proxy, session)
@@ -88,15 +95,15 @@ def empty_df(index=[]):
     return empty
 
 
-def get_html(url, proxy=None, session=None):
+def get_html(url, proxy=None, session=None, auth=None):
     session = session or _requests
-    html = session.get(url=url, proxies=proxy, headers=user_agent_headers).text
+    html = session.get(url=url, proxies=proxy, auth=auth, headers=user_agent_headers).text
     return html
 
 
-def get_json(url, proxy=None, session=None):
+def get_json(url, proxy=None, session=None, auth=None):
     session = session or _requests
-    html = session.get(url=url, proxies=proxy, headers=user_agent_headers).text
+    html = session.get(url=url, proxies=proxy, auth=auth, headers=user_agent_headers).text
 
     if "QuoteSummaryStore" not in html:
         html = session.get(url=url, proxies=proxy).text
