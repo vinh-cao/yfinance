@@ -45,9 +45,10 @@ _BASE_URL_ = 'https://query2.finance.yahoo.com'
 _SCRAPE_URL_ = 'https://finance.yahoo.com/quote'
 
 class TickerBase():
-    def __init__(self, ticker, session=None):
+    def __init__(self, ticker, session=None, proxy=None):
         self.ticker = ticker.upper()
         self.session = session
+        self.proxy = utils.get_proxy(proxy)
         self._history = None
         self._base_url = _BASE_URL_
         self._scrape_url = _SCRAPE_URL_
@@ -85,10 +86,9 @@ class TickerBase():
 
     def stats(self, proxy=None):
         # setup proxy in requests format
-        if proxy is not None:
-            if isinstance(proxy, dict) and "https" in proxy:
-                proxy = proxy["https"]
-            proxy = {"https": proxy}
+        proxy = utils.get_proxy(proxy)
+        if proxy is None:
+            proxy = self.proxy
 
         if self._fundamentals:
             return
@@ -171,10 +171,9 @@ class TickerBase():
             params["interval"] = "15m"
 
         # setup proxy in requests format
-        if proxy is not None:
-            if isinstance(proxy, dict) and "https" in proxy:
-                proxy = proxy["https"]
-            proxy = {"https": proxy}
+        proxy = utils.get_proxy(proxy)
+        if proxy is None:
+            proxy = self.proxy
 
         # Getting data from json
         url = "{}/v8/finance/chart/{}".format(self._base_url, self.ticker)
@@ -322,10 +321,9 @@ class TickerBase():
             return df
 
         # setup proxy in requests format
-        if proxy is not None:
-            if isinstance(proxy, dict) and "https" in proxy:
-                proxy = proxy["https"]
-            proxy = {"https": proxy}
+        proxy = utils.get_proxy(proxy)
+        if proxy is None:
+            proxy = self.proxy
 
         if self._fundamentals:
             return
@@ -658,10 +656,9 @@ class TickerBase():
             return self._isin
 
         # setup proxy in requests format
-        if proxy is not None:
-            if isinstance(proxy, dict) and "https" in proxy:
-                proxy = proxy["https"]
-            proxy = {"https": proxy}
+        proxy = utils.get_proxy(proxy)
+        if proxy is None:
+            proxy = self.proxy
 
         q = ticker
         self.get_info(proxy=proxy)
@@ -697,10 +694,9 @@ class TickerBase():
             return self._news
 
         # setup proxy in requests format
-        if proxy is not None:
-            if isinstance(proxy, dict) and "https" in proxy:
-                proxy = proxy["https"]
-            proxy = {"https": proxy}
+        proxy = utils.get_proxy(proxy)
+        if proxy is None:
+            proxy = self.proxy
 
         # Getting data from json
         url = "{}/v1/finance/search?q={}".format(self._base_url, self.ticker)

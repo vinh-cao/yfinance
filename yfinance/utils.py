@@ -64,6 +64,13 @@ def get_all_by_isin(isin, proxy=None, session=None):
     except Exception:
         return {}
 
+def get_proxy(proxy):
+    if proxy is not None:
+        if isinstance(proxy, dict) and "https" in proxy:
+            proxy = proxy["https"]
+        proxy = {"https": proxy}
+    return proxy
+
 
 def get_ticker_by_isin(isin, proxy=None, session=None):
     data = get_all_by_isin(isin, proxy, session)

@@ -107,7 +107,7 @@ def download(tickers, start=None, end=None, actions=False, threads=True,
                                    actions=actions, auto_adjust=auto_adjust,
                                    back_adjust=back_adjust,
                                    progress=(progress and i > 0), proxy=proxy,
-                                   rounding=rounding, timeout=timeout)
+                                   rounding=rounding, timeout=timeout, **kwargs)
         while len(shared._DFS) < len(tickers):
             _time.sleep(0.01)
 
@@ -118,7 +118,7 @@ def download(tickers, start=None, end=None, actions=False, threads=True,
                                  start=start, end=end, prepost=prepost,
                                  actions=actions, auto_adjust=auto_adjust,
                                  back_adjust=back_adjust, proxy=proxy,
-                                 rounding=rounding, timeout=timeout)
+                                 rounding=rounding, timeout=timeout, **kwargs)
             shared._DFS[ticker.upper()] = data
             if progress:
                 shared._PROGRESS_BAR.animate()
@@ -136,23 +136,25 @@ def download(tickers, start=None, end=None, actions=False, threads=True,
     if len(tickers) == 1:
         ticker = tickers[0]
         return shared._DFS[shared._ISINS.get(ticker, ticker)]
+    else:
+        return shared._DFS
 
-    try:
-        data = _pd.concat(shared._DFS.values(), axis=1,
-                          keys=shared._DFS.keys())
-    except Exception:
-        _realign_dfs()
-        data = _pd.concat(shared._DFS.values(), axis=1,
-                          keys=shared._DFS.keys())
-
-    # switch names back to isins if applicable
-    data.rename(columns=shared._ISINS, inplace=True)
-
-    if group_by == 'column':
-        data.columns = data.columns.swaplevel(0, 1)
-        data.sort_index(level=0, axis=1, inplace=True)
-
-    return data
+    # try:
+    #     data = _pd.concat(shared._DFS.values(), axis=1,
+    #                       keys=shared._DFS.keys())
+    # except Exception:
+    #     _realign_dfs()
+    #     data = _pd.concat(shared._DFS.values(), axis=1,
+    #                       keys=shared._DFS.keys())
+    #
+    # # switch names back to isins if applicable
+    # data.rename(columns=shared._ISINS, inplace=True)
+    #
+    # if group_by == 'column':
+    #     data.columns = data.columns.swaplevel(0, 1)
+    #     data.sort_index(level=0, axis=1, inplace=True)
+    #
+    # return data
 
 
 def _realign_dfs():
@@ -183,11 +185,11 @@ def _download_one_threaded(ticker, start=None, end=None,
                            auto_adjust=False, back_adjust=False,
                            actions=False, progress=True, period="max",
                            interval="1d", prepost=False, proxy=None,
-                           rounding=False, timeout=None):
+                           rounding=False, timeout=None, **kwargs):
 
     data = _download_one(ticker, start, end, auto_adjust, back_adjust,
                          actions, period, interval, prepost, proxy, rounding,
-                         timeout)
+                         timeout, **kwargs)
     shared._DFS[ticker.upper()] = data
     if progress:
         shared._PROGRESS_BAR.animate()
@@ -197,11 +199,11 @@ def _download_one(ticker, start=None, end=None,
                   auto_adjust=False, back_adjust=False,
                   actions=False, period="max", interval="1d",
                   prepost=False, proxy=None, rounding=False,
-                  timeout=None):
+                  timeout=None, **kwargs):
 
     return Ticker(ticker).history(period=period, interval=interval,
                                   start=start, end=end, prepost=prepost,
                                   actions=actions, auto_adjust=auto_adjust,
                                   back_adjust=back_adjust, proxy=proxy,
                                   rounding=rounding, many=True,
-                                  timeout=timeout)
+                                  timeout=timeout, **kwargs)
